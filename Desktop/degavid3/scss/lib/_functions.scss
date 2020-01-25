@@ -1,8 +1,0 @@
-/*-----------------------------------------*\
-                  FUNCTIONS
-\*-----------------------------------------*/
-
-// incrementa el padding base de acuerdo al incremento que se le asigne como parametro
-@function spacing($increment) {
-  @return $padding-base * $increment;
-}
