@@ -4,12 +4,12 @@ const Schema = mongoose.Schema;
 
 const StockItemsSchema = new Schema({
     stock: { 
-        type: mongoose.Schema.ObjectId,
+        type: Schema.Types.ObjectId,
         required: true,
         ref: 'stock'
     },
     restaurant: {
-        type: mongoose.Schema.ObjectId,
+        type: Schema.Types.ObjectId,
         required: true,
         ref: 'restaurant'
     },

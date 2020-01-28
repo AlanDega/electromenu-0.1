@@ -10,8 +10,8 @@ const RestaurantSchema = new Schema({
         required: true,
     },
     stock: { 
-        type: mongoose.Schema.ObjectId,
-        required: true,
+        type: Schema.Types.ObjectId,
+        required: false,
         ref:'stock'
     },
     description: {

@@ -4,7 +4,7 @@ module.exports = buildSchema(`
 type Restaurant {
   _id: ID!
   title: String!
-  stock: Stock!
+  stock: Stock
   description: String
   direccion: String
   telefonos: String
@@ -17,8 +17,7 @@ type Restaurant {
 
 type Stock {
   _id:ID!
-  restaurant:Restaurant
-  items:[StockItems!]
+  items:[StockItems]
   title:String!
   description:String
   is_active:Boolean!
@@ -82,6 +81,7 @@ type RootQuery {
   stocks: [Stock!]!
   restaurants: [Restaurant!]!
   orders(offset:Int): [Order!]!
+  getRestaurant(id:String): Restaurant!
 }
 
 type RootMutation {

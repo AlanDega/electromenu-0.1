@@ -6,12 +6,15 @@ const mongoose = require('mongoose');
 
 module.exports = {
   createRestaurant: async (args, req) => {
-    console.log('createRestaurant', req)
+    console.log('createRestaurant', args)
     try {
 
+      const stock = new Stock({
+          title: args.restaurant.stock.title
+      })
         const restaurant = new Restaurant({
                 title: args.restaurant.title,
-                stock:args.restaurant.stock
+                stock: stock
             });
         const result = await restaurant.save();            
         return { ...result._doc, _id: result.id };
@@ -20,4 +23,16 @@ module.exports = {
         throw err;
     }
   },
-}
+
+  getRestaurant: async (args, req) => {
+    console.log('getRestaurant', args)
+    try {
+			const restaurant = await Restaurant.findById(args.id);
+			if (!restaurant) throw new Error('restaurant does not exist')
+			console.log(restaurant)
+			return transformRestaurant(restaurant);
+		} catch (err) {
+			throw err;
+		}
+  }
+} 

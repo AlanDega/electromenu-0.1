@@ -3,14 +3,9 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const StockSchema = new Schema({
-
-    restaurant: { 
-        type: mongoose.Schema.ObjectId,
-        required: true,
-        ref:'restaurant'
-    },
+   
     items: {
-        type: [mongoose.Schema.ObjectId],
+        type: [Schema.Types.ObjectId],
         required: false,
         ref: 'stockItems'
     },
@@ -20,7 +15,7 @@ const StockSchema = new Schema({
     },
     is_active: {
         type: Boolean,
-        default: true
+        default: false
     }
 }, {
     timestamps: true
