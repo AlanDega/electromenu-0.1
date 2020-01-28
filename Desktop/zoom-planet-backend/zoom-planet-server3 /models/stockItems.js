@@ -2,20 +2,23 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const InventarioSchema = new Schema({
-
-    restaurante: { 
+const StockItemsSchema = new Schema({
+    stock: { 
         type: mongoose.Schema.ObjectId,
         required: true,
-        ref:'restaurante'
+        ref: 'stock'
     },
-    items: {
-        type: [mongoose.Schema.ObjectId],
+    restaurant: {
+        type: mongoose.Schema.ObjectId,
         required: true,
-        ref: 'inventarioItems'
+        ref: 'restaurant'
     },
-    title: {
+    item: {
         type: String,
+        required: true,
+    },
+    cantidad: {
+        type: Number,
         required: true
     },
     is_active: {
@@ -26,5 +29,5 @@ const InventarioSchema = new Schema({
     timestamps: true
 });
 
-module.exports = mongoose.model('inventario', InventarioSchema);
+module.exports = mongoose.model('stockItems', StockItemsSchema);
 

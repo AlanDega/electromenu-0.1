@@ -1,9 +1,10 @@
 const { buildSchema } = require('graphql');
 
 module.exports = buildSchema(`
-type Restaurante {
+type Restaurant {
   _id: ID!
   title: String!
+  stock: Stock!
   description: String
   direccion: String
   telefonos: String
@@ -14,10 +15,10 @@ type Restaurante {
   updatedAt: String!
 }
 
-type Inventario {
+type Stock {
   _id:ID!
-  restaurante:Restaurante!
-  items:[InventarioItems!]!
+  restaurant:Restaurant
+  items:[StockItems!]
   title:String!
   description:String
   is_active:Boolean!
@@ -25,10 +26,8 @@ type Inventario {
   updatedAt:String!
 }
 
-type InventarioItems {
+type StockItems {
   _id:ID!
-  inventario:Inventario!
-  restaurante:Restaurante!
   item:String!
   cantidad:Int!
   is_active:Boolean!
@@ -36,9 +35,25 @@ type InventarioItems {
   updatedAt:String!
 }
 
+type Item {
+  _id:ID!
+  quantity:Int!
+  is_active:Boolean!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type Order {
+  _id: ID!
+  items:[Item!]!
+  createdAt: String!
+  updatedAt: String!
+}
+
 input RestaurantInput{
   _id:String
   title:String!
+  stock: StockInput
   description: String
   direccion: String
   telefonos: String
@@ -47,33 +62,37 @@ input RestaurantInput{
   is_active: Boolean
 }
 
-input InventarioInput {
+input StockInput {
+  _id:String
+  title: String!
+  cantidad_minima: Int
+}
+input StockItemInput {
   _id:String
   title: String!
   cantidad_minima: Int!
 }
 
-input InventarioItemInput {
-  _id:String
-  title: String!
-  cantidad_minima: Int!
+input OrderInput {
+  food:String!
+  quantity:Int!
 }
 
 type RootQuery {
-  inventarios: [inventario!]!
-  restaurants:[Restaurant!]!
-
+  stocks: [Stock!]!
+  restaurants: [Restaurant!]!
+  orders(offset:Int): [Order!]!
 }
 
 type RootMutation {
-  createInventario(inventario: InventarioInput): Inventario!
-  createInventarioItems(item: InventarioItemInput): [InventarioItems!]
+  createOrder(orderInput: OrderInput): Order!
+  createStock(stock: StockInput): Stock!
+  createStockItems(item: StockItemInput): [StockItems!]
   createRestaurant(restaurant:RestaurantInput): Restaurant!
-
 }
 
 schema {
-    query: RootQuery
-    mutation: RootMutation
+  query: RootQuery
+  mutation: RootMutation
 }
 `);

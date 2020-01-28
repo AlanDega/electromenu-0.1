@@ -3,11 +3,16 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const RestauranteSchema = new Schema({
+const RestaurantSchema = new Schema({
 
     title: { 
         type: String,
         required: true,
+    },
+    stock: { 
+        type: mongoose.Schema.ObjectId,
+        required: true,
+        ref:'stock'
     },
     description: {
         type: String,
@@ -33,5 +38,5 @@ const RestauranteSchema = new Schema({
     timestamps: true
 });
 
-module.exports = mongoose.model('restaurante', RestauranteSchema);
+module.exports = mongoose.model('restaurant', RestaurantSchema);
 

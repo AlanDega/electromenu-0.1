@@ -7,10 +7,10 @@ const engines = require("consolidate");
 const { graphqlUploadExpress } = require('graphql-upload');
 const graphQlSchema = require('./graphql/schema/index');
 const graphQlResolvers = require('./graphql/resolvers/index');
-const paypal = require('./routes/paypal');
-const stripe = require('./routes/stripe');
-const isAuth = require('./middleware/is-auth');
-const config = require('./helpers/config');
+// const paypal = require('./routes/paypal');
+// const stripe = require('./routes/stripe');
+// const isAuth = require('./middleware/is-auth');
+// const config = require('./helpers/config');
 const app = express();
 
 app.engine("ejs", engines.ejs);
@@ -32,10 +32,10 @@ app.use((req, res, next) => {
 // app.use('/images/itemslist', express.static('public/images/itemslist'))
 app.use(express.static('public'))
 
-app.use(isAuth);
+// app.use(isAuth);
 
-app.use('/paypal', paypal)
-app.use('/stripe', stripe)
+// app.use('/paypal', paypal)
+// app.use('/stripe', stripe)
 
 app.use(
   '/graphql',
@@ -47,22 +47,19 @@ app.use(
   })
 );
 
-app.get('/', function (req, res) {
-  res.sendFile(path.join(__dirname + '/static/food-delivery-landingPage/index.html'));
-});
-/*
+
+
 app.get('/chat', function (req, res) {
   res.sendFile(path.join(__dirname + '/static/food-delivery-landingPage/food-delivery-chat.html'));
 });
-*/
 app.use("/dashboard", express.static(path.join(__dirname, '/build')))
 
-app.get('/*', (req, res) => {
-  res.sendFile(path.join(__dirname + '/build/index.html'))
-})
+// app.get('/*', (req, res) => {
+//   res.sendFile(path.join(__dirname + '/build/index.html'))
+// })
 
 mongoose
- .connect(`mongodb://gexpress:O1jo-1205-1974@144.91.86.95:27017/gourmet_express`, {
+ .connect(`mongodb+srv://playerone:playerone@cluster0-l5x8w.mongodb.net/test?retryWrites=true&w=majority`, {
    useNewUrlParser: true
  })/*
   .connect(
@@ -71,6 +68,7 @@ mongoose
   )*/
   .then(() => {
     app.listen(8000);
+    console.log('el servidor esta corriendo')
   })
   .catch(err => {
     console.log(err);
