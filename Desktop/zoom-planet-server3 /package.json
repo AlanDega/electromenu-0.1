@@ -1,0 +1,33 @@
+{
+  "name": "gourmetexpress-api",
+  "version": "2.0.0",
+  "description": "gourmet express api",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.18.3",
+    "consolidate": "^0.15.1",
+    "dataloader": "^1.4.0",
+    "ejs": "^2.6.1",
+    "expo-server-sdk": "^3.2.0",
+    "express": "^4.16.4",
+    "express-graphql": "^0.7.1",
+    "firebase-admin": "^7.3.0",
+    "graphql": "^14.0.2",
+    "graphql-upload": "^8.0.4",
+    "jsonwebtoken": "^8.4.0",
+    "mongoose": "^5.3.15",
+    "nodemailer": "^6.1.1",
+    "paypal-rest-sdk": "^1.8.1",
+    "stripe": "^7.0.1",
+    "tinify": "^1.6.0-beta.2",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.4"
+  }
+}
