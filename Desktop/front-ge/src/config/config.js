@@ -1,0 +1,12 @@
+//export const server_url = "http://pepper:8000/"
+//export const server_url = "http://localhost:8000/"
+export const server_url = "https:localhost:4000"
+//export const cloudinary_upload_url = "https://api.cloudinary.com/v1_1/dgdpsy6t9/image/upload"
+export const cloudinary_upload_url = "https://api.cloudinary.com/v1_1/dtxshn6zt/image/upload"
+export const cloudinary_category = "preset-category"
+export const cloudinary_restaurant = "preset-restaurante"
+export const cloudinary_food = "preset-platillos"
+export const cloudinary_profile = "preset-profile"
+export const cloudinary_promociones="preset-promociones"
+
+//export const cloudinary_profile = "nh9fd8i5"
