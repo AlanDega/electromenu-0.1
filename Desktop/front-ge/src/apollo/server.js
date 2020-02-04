@@ -15,6 +15,12 @@ mutation CreateInventario($inventarioInput:InventarioInput!){
     }
   }`
 
+  export const deleteInventario = `
+      mutation DeleteInventario($id:String!){
+        deleteInventario(id:$id)
+      }`
+
+
 export const editInventario = `
     mutation EditInventario($inventarioInput:InventarioInput!){
         editInventario(
@@ -33,16 +39,18 @@ export const editInventario = `
          
       }`
 
-export const deleteInventario = `
-mutation DeleteInventario($id:String!){
-  deleteInventario(id:$id){
-    _id
-  }
-}`
 
 export const getInventarios = `query Inventarios{
   inventarios{
+    _id
     title
+  }
+}`
+
+export const getInventarioItems = `query InventarioItems{
+  inventariosItems{
+    _id
+    item
   }
 }`
 

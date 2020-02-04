@@ -1,157 +1,161 @@
-import React from "react";
-import gql from "graphql-tag";
-import { Query, Mutation } from "react-apollo";
-import { withTranslation } from 'react-i18next';
-import InventarioComponent from '../components/Inventarios/Inventario'
-// reactstrap components
+import React, { Component } from 'react';
 import {
-  Card,
-  CardHeader,
-  Container,
-  Row,
-  Table,
-  Media,
-  UncontrolledDropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
-  Modal
-} from "reactstrap";
-
-// core components
+    Container,
+    Row,
+    Card,
+    CardHeader,
+    Table,
+    Media,
+    UncontrolledDropdown,
+    DropdownToggle,
+    DropdownMenu,
+    DropdownItem,
+    Modal
+} from 'reactstrap';
 import Header from "components/Headers/Header.jsx";
-import { getInventarios, deleteRestaurant, deleteInventario } from "../apollo/server";
+import InventarioComponent from '../components/Inventarios/Inventario';
+import { getInventarios, deleteInventario } from '../apollo/server';
+import { withTranslation } from 'react-i18next';
+import gql from 'graphql-tag';
+import { Query, Mutation } from 'react-apollo';
 
 const GET_INVENTARIOS = gql`${getInventarios}`
-const DELETE_INVENTARIOS = gql`${deleteInventario}`
+const DELETE_INVENTARIO = gql`${deleteInventario}`
 
-class Inventarios extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      editModal: false,
-      inventario: null
-    };
-  }
-  toggleModal = inventario => {
-    this.setState({
-      editModal: !this.state.editModal,
-      inventario
-    })
-  }
-  render() {
-    const { t } = this.props;
-    return (
-      <>
-        <Header />
-        {/* Page content */}
-        <Container className="mt--7" fluid>
-          {<InventarioComponent />}
-          {/* Table */}
-          <Row className="mt-5">
-            <div className="col">
-              <Card className="shadow">
-                <CardHeader className="border-0">
-                  <h3 className="mb-0">{t("Inventario")}</h3>
-                </CardHeader>
-                <Table className="align-items-center table-flush" responsive>
-                  <thead className="thead-light">
-                    <tr>
-                      <th scope="col">{t("Title")}</th>
-                      <th scope="col">{t("Description")}</th>
-                      <th scope="col">{t("Image")}</th>
-                      <th scope="col" />
-                    </tr>
-                  </thead>
-                  <tbody>
+class Inventarios extends Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            inventario: null,
+            editModal: false
+        };
+    }
+    toggleModal = (inventario) => {
+        this.setState({
+            editModal: !this.state.editModal,
+            inventario
+        });
+    }
+    onCompleted = ({ deleteInventario }) => {
+        console.log(deleteInventario)
+    }
+    onError = (error) => {
+        console.log(error)
+    }
+    update = (proxy, { data: { deleteInventario } }) => {
+        try {
+            if (deleteInventario) {
+                const data = proxy.readQuery({ query: GET_INVENTARIOS});
+                data.inventarios= data.inventarios.filter(inventario => inventario._id !== deleteInventario);
+                proxy.writeQuery({ query: GET_INVENTARIOS, data });
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    render() {
+        const { t } = this.props
+        return (
+            <>
+                <Header />
+                {/* Page content */}
+                <Container className="mt--7" fluid>
+                    <InventarioComponent />
+                    <Row className="mt-5">
+                        <div className="col">
+                            <Card className="shadow">
+                                <CardHeader className="border-0">
+                                    <h3 className="mb-0">{t("Inventarios")}</h3>
+                                </CardHeader>
+                                <Table className="align-items-center table-flush" responsive>
+                                    <thead className="thead-light">
+                                        <tr>
+                                            <th scope="col">{t("Title")}</th>
+                                            <th scope="col">{t("Description")}</th>
+                                          
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <Query query={GET_INVENTARIOS}>
+                                            {({ loading, error, data }) => {
+                                                if (loading) return <tr><td>{t("Loading")}</td></tr>;
+                                                if (error) return <tr><td>`${t("Error")}! ${error.message}`</td></tr>;
+                                                return data.inventarios.map(inventario =>
+                                                    <tr key={inventario._id}>
+                                                        <th scope="row">
+                                                            <Media>
+                                                                <span className="mb-0 text-sm">
+                                                                    {inventario.title}
+                                                                </span>
+                                                            </Media>
+                                                        </th>
+                                                        <td style={{ whiteSpace: 'pre' }}>{inventario.description}</td>
+                                                        
+                                                        <td className="text-right">
+                                                            <UncontrolledDropdown>
+                                                                <DropdownToggle
+                                                                    className="btn-icon-only text-light"
+                                                                    href="#pablo"
+                                                                    role="button"
+                                                                    size="sm"
+                                                                    color=""
+                                                                    onClick={e => e.preventDefault()}
+                                                                >
+                                                                    <i className="fas fa-ellipsis-v" />
+                                                                </DropdownToggle>
+                                                                <DropdownMenu className="dropdown-menu-arrow" right>
+                                                                    <DropdownItem
+                                                                        href="#pablo"
+                                                                        onClick={e => {
+                                                                            e.preventDefault()
+                                                                            this.toggleModal(inventario)
+                                                                        }
+                                                                        }
+                                                                    >
+                                                                        {t("Edit")}
+                                                                    </DropdownItem>
+                                                                    <Mutation mutation={DELETE_INVENTARIO}
+                                                                        onCompleted={this.onCompleted}
+                                                                        onError={this.onError}
+                                                                        update={this.update} >
+                                                                        {(deleteInventario) => {
+                                                                            return <DropdownItem
+                                                                                href="#pablo"
+                                                                                onClick={e => {
+                                                                                    e.preventDefault()
+                                                                                    deleteInventario({ variables: { id: inventario._id } })
+                                                                                }}
+                                                                            >
+                                                                                {t("Delete")}
+                                                                            </DropdownItem>
+                                                                        }}
+                                                                    </Mutation>
+                                                                </DropdownMenu>
+                                                            </UncontrolledDropdown>
+                                                        </td>
+                                                    </tr>
+                                                )
+                                            }}
+                                        </Query>
+                                    </tbody>
+                                </Table>
 
-                    <Query query={GET_INVENTARIOS}>
-                      {({ loading, error, data }) => {
-                          console.log('data',data)
-                        if (loading) return <tr><td>{t("Loading")}...</td></tr>;
-                        if (error) return <tr><td>`${t("Error")}! ${error.message}`</td></tr>;
-                        
-                        return data.inventarios.map(inventario => 
-                          <tr key={inventario._id}>
-                            <th scope="row">
-                              <Media>
-                                <span className="mb-0 text-sm">
-                                  {inventario.title}
-                                  
-                                </span>
-                              </Media>
-                            </th>
-                            {/* <td>{inventario.description}</td> */}
-                           
-                            <td className="text-right">
-                              
-                              <UncontrolledDropdown>
-                                <DropdownToggle
-                                  className="btn-icon-only text-light"
-                                  href="#pablo"
-                                  role="button"
-                                  size="sm"
-                                  color=""
-                                  onClick={e => e.preventDefault()}
-                                >
-                                  <i className="fas fa-ellipsis-v" />
-                                </DropdownToggle>
-                                <DropdownMenu className="dropdown-menu-arrow" right>
-                                  <DropdownItem
-                                    href="#pablo"
-                                    onClick={e => {
-                                      e.preventDefault()
-                                      this.toggleModal(inventario)
-                                    }}>
-                                    {t("Edit")}
-                                  </DropdownItem>
-                                  
-                                  <Mutation mutation={DELETE_INVENTARIOS}
-                                  //double mutation like this double query 
-                                    refetchQueries={[{ query: GET_INVENTARIOS }, { query: GET_FOODS }]}
-                                    onCompleted={this.onCompleted}
-                                    onError={this.onError}>
+                            </Card>
+                        </div>
+                    </Row>
+                    <Modal
+                        className="modal-dialog-centered"
+                        size="lg"
+                        isOpen={this.state.editModal}
+                        toggle={() => { this.toggleModal() }}
+                    >
+                        <InventarioComponent addon={this.state.inventario} />
+                    </Modal>
 
-                                    {(deleteInventario, { loading }) => {
-                                      if (loading) return t("Loading")
-                                      return <DropdownItem
-                                        href="#pablo"
-                                        onClick={e => {
-                                          e.preventDefault()
-                                          // si no fnciona utilizar el del te mutation de restaurante 
-                                          deleteInventario({ variables: { id: inventario._id } })
-                                        }}>
-                                        {t("Delete")}
-                                      </DropdownItem>
-                                    }}
-                                  </Mutation>
-                                
-                                </DropdownMenu>
-                              </UncontrolledDropdown>
-                            </td>
-                          </tr>)
-                      }}
-                    </Query>
-                  </tbody>
-                </Table>
-              </Card>
-            </div>
-          </Row>
-
-          <Modal
-            className="modal-dialog-centered"
-            size="lg"
-            isOpen={this.state.editModal}
-            toggle={() => { this.toggleModal(null) }}>
-
-            <InventarioComponent inventario={this.state.inventario} />
-
-          </Modal>
-
-        </Container>
-      </>
-    );
-  }
+                </Container>
+            </>
+        )
+    }
 }
 
-export default withTranslation()(Inventarios);
+export default withTranslation()(Inventarios)
