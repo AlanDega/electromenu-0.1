@@ -20,7 +20,7 @@ import {
 
 // core components
 import Header from "components/Headers/Header.jsx";
-import { getInventarios, deleteRestaurant, getFoods, deleteInventario } from "../apollo/server";
+import { getInventarios, deleteRestaurant, deleteInventario } from "../apollo/server";
 
 const GET_INVENTARIOS = gql`${getInventarios}`
 const DELETE_INVENTARIOS = gql`${deleteInventario}`
