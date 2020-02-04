@@ -24,7 +24,6 @@ import { getInventarios, deleteRestaurant, getFoods, deleteInventario } from "..
 
 const GET_INVENTARIOS = gql`${getInventarios}`
 const DELETE_INVENTARIOS = gql`${deleteInventario}`
-const GET_FOODS = gql`${getFoods}`
 
 class Inventarios extends React.Component {
   constructor(props) {
