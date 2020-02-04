@@ -10,7 +10,7 @@ import ResetPassword from "./views/ForgotPassword";
 import Riders from "./views/Riders";
 import Options from "./views/Options";
 import Addons from "./views/Addons";
-import Inventory from "./views/Inventory";
+import Inventarios from "./views/Inventarios";
 import Dashboard from "./views/Dashboard";
 
 var routes = [
@@ -103,10 +103,10 @@ var routes = [
     appearInSidebar: true
   },
   {
-    path: "/inventory",
-    name: "Inventario",
+    path: "/inventarios",
+    name: "Inventarios",
     icon: "ni ni-settings-gear-65 text-black",
-    component: Inventory,
+    component: Inventarios,
     layout: "/admin",
     appearInSidebar: true
   },

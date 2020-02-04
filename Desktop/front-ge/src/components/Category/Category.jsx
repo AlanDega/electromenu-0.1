@@ -36,6 +36,7 @@ class Category extends React.Component {
             successMessage: '',
             titleError: null,
             descriptionError: null,
+            //aqui traemos inventory 
             mutation: props.category ? EDIT_CATEGORY : CREATE_CATEGORY
         };
     }

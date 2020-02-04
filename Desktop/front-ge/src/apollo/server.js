@@ -1,32 +1,50 @@
-export const getFoods = `query Foods{
-    foods{
+export const createInventario = `
+mutation CreateInventario($inventarioInput:InventarioInput!){
+  createInventario(
+    inventarioInput:$inventarioInput
+    ){
       _id
+      restaurant
+      items{
+        _id
+        item
+        cantidad
+      }
       title
       description
-      img_url
-      variations{
-        _id
-        title
-        price
-        addons{
-          _id
-          title
-          description
-          quantity_minimum
-          quantity_maximum
-          options{
-            _id
-            title
-            price
-          }
-        }
-      }
-      category{
-          _id
-          title
-      }
     }
   }`
+
+export const editInventario = `
+    mutation EditInventario($inventarioInput:InventarioInput!){
+        editInventario(
+            inventarioInput:$inventarioInput
+        ){
+          _id
+          restaurant
+          items{
+            _id
+            item
+            cantidad
+          }
+          title
+          description
+        }
+         
+      }`
+
+export const deleteInventario = `
+mutation DeleteInventario($id:String!){
+  deleteInventario(id:$id){
+    _id
+  }
+}`
+
+export const getInventarios = `query Inventarios{
+  inventarios{
+    title
+  }
+}`
 
 export const createFood = `
   mutation CreateFood($foodInput:FoodInput!){
@@ -60,6 +78,39 @@ export const createFood = `
       }
       }
     }`
+    
+export const getFoods = `query Foods{
+
+    foods{
+      _id
+      title
+      description
+      img_url
+      variations{
+        _id
+        title
+        price
+        addons{
+          _id
+          title
+          description
+          quantity_minimum
+          quantity_maximum
+          options{
+            _id
+            title
+            price
+          }
+        }
+      }
+      category{
+          _id
+          title
+      }
+    }
+  }`
+
+
 
 export const editFood = `
     mutation EditFood($foodInput:FoodInput!){
