@@ -43,7 +43,7 @@ class PageHeader extends React.Component {
           }}>
             <img
               style={{ alignSelf: "flex-end" }}
-              src={ALAN} />
+              src="https://res.cloudinary.com/dalnnaod7/image/upload/v1591129086/ALAN_kjfpet.png" />
             <div
               style={{
                 width: "100%",
@@ -65,7 +65,7 @@ class PageHeader extends React.Component {
             </div>
             <img
               style={{ alignSelf: "flex-start",  }}
-              src={DEGA} />
+              src="https://res.cloudinary.com/dalnnaod7/image/upload/v1591129092/DEGA_dymjqd.png" />
           </div>
         </Container>
       </div>
