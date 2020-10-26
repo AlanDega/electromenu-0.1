@@ -1,0 +1,380 @@
+import React, { useState, useEffect, useContext } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  ImageBackground,
+  ActivityIndicator,
+  ScrollView,
+  FlatList
+} from "react-native";
+import NetInfo from "@react-native-community/netinfo";
+import { AuthUserContext } from "../navigation/AuthUserProvider";
+import { getOrders } from "../components/Firebase/firebase";
+import { threadsCollection } from "../components/Firebase/firebase";
+import { dualfire } from "../components/Firebase/firebase";
+import { IconButton, Button } from "react-native-paper";
+
+import useStatusBar from "../hooks/useStatusBar";
+import Tacos from "../components/Tacos";
+import Burritos from "../components/Burritos";
+import Postres from "../components/Postres";
+import Bebidas from "../components/Bebidas";
+import Swiper from "react-native-swiper";
+import ClosedAnimation from "../components/ClosedAnimation";
+
+export default function HomeScreen({ navigation }) {
+  useStatusBar("dark-content");
+  const { user, setUser } = useContext(AuthUserContext);
+  const [Locals, setLocals] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [totalCount, setTotalCount] = useState(0);
+  const [totalQuantity, setTotalQuantity] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [actualUser, setActualUser] = useState();
+  const [isBasketEmpty, setisBasketEmpty] = useState();
+  const [isServiceAvailable, setisServiceAvailable] = useState();
+  const [isServiceUnavailable, setisServiceUnavailable] = useState();
+  const [visible, setVisible] = useState(false);
+  const [isConnected, setisConnected] = useState();
+
+  useEffect(() => {
+    dualfire()
+      .collection("locals")
+      .get()
+      .then(querySnapshot => {
+        const documents = querySnapshot.docs.map(doc => {
+          return {
+            _id: doc.id,
+            data: doc.data()
+          };
+        });
+
+        setLocals(documents);
+      });
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener(state => {
+      // console.log("Connection type", state.type);
+      // console.log("Is connected?", state.isConnected);
+      if (state.isConnected === false) {
+        // console.log("sin conexión a internet");
+        setVisible(true);
+        setisConnected(false);
+      } else {
+        setVisible(false);
+        setisConnected(true);
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    dualfire()
+      .collection("AVAILABILITY")
+      .doc("state")
+      .onSnapshot(snapshot => {
+        // console.warn("snapshot", snapshot.data());
+        if (snapshot.data().availability === true) {
+          setisServiceUnavailable(false);
+          setisServiceAvailable(true);
+        } else {
+          setisServiceAvailable(false);
+          setisServiceUnavailable(true);
+        }
+      });
+    return () => {
+      dualfire();
+    };
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      if (user) {
+        threadsCollection()
+          .doc(user.uid)
+          .update({
+            mobilePresence: false
+          })
+          .then(() => {
+            // console.warn("updated");
+          });
+      }
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
+  // useEffect(() => {
+  // setLoading(true);
+  //   if (user) {
+  //     setActualUser(user.uid);
+  //     // console.warn("actual", actualUser);
+  //     var usuario = user.uid;
+  //     // console.warn("usuario", usuario)
+  //     dualfire()
+  //       .collection('users')
+  //       .get()
+  //       .then(querySnapshot => {
+  //         const documents = querySnapshot.docs.map(doc => doc.data());
+  //         // console.warn("document", documents)
+  //         docker(documents);
+  //         setLoading(false);
+  //       });
+  //   }
+
+  //   return () => {};
+  // }, []);
+
+  useEffect(() => {
+    if (user) {
+      var usuario = user.uid;
+      dualfire()
+        .collection("users")
+        .doc(usuario)
+        .collection("BASKET")
+        .onSnapshot(querySnapshot => {
+          const documents = querySnapshot.docs.map(doc => doc.data());
+          if (documents.length === 0) {
+            setisBasketEmpty(true);
+            setLoading(false);
+          } else {
+            setisBasketEmpty(false);
+          }
+          docker(documents);
+        });
+    }
+
+    return () => {};
+  }, []);
+
+  const docker = docs => {
+    let nums = 0;
+    docs.map(doc => {
+      // console.warn("prizedoc", doc.totalPrice, nums);
+      nums += doc.totalPrice;
+    });
+    setTotalQuantity(docs.length);
+    setTotalCount(nums);
+  };
+
+  let basketBtn = <TouchableOpacity></TouchableOpacity>;
+
+  if (loading) {
+    basketBtn = <ActivityIndicator animating={loading} size="large" />;
+  }
+  if (!loading) {
+    basketBtn = <TouchableOpacity></TouchableOpacity>;
+  }
+
+  if (!loading && totalCount > 0) {
+    basketBtn = (
+      <TouchableOpacity
+        onPress={() => {
+          navigation.navigate("Basket");
+        }}
+      >
+        <View style={styles.basketBtn}>
+          <Text style={styles.count}>${totalCount}</Text>
+          <Text style={{ fontSize: 20, color: "white" }}>Ver la bolsa </Text>
+          <View
+            style={{ marginRight: 20, height: 30, width: 30, padding: 5 }}
+          ></View>
+        </View>
+      </TouchableOpacity>
+    );
+  }
+
+  if (loading) {
+    basketBtn = <ActivityIndicator animating={loading} size="large" />;
+  }
+
+  const navigateToBasket = () => {
+    // console.warn("click");
+    navigation.navigate("Basket");
+  };
+
+  let availabilitySwitch = <View></View>;
+
+  if (isServiceAvailable && isConnected) {
+    availabilitySwitch = (
+      <>
+        <View style={{ marginTop: 30 }}></View>
+        <ScrollView>
+          <FlatList
+            data={Locals}
+            renderItem={({ item }) => (
+              <View style={styles.local}>
+                <TouchableOpacity>
+                  <ImageBackground
+                    borderRadius={9}
+                    style={styles.localCardImage}
+                    source={{ uri: item.data.image }}
+                  >
+                    <IconButton icon="heart-outline" size={32} color="white" />
+                  </ImageBackground>
+                </TouchableOpacity>
+                <View style={styles.itemMetadata}>
+                  <Text>{item.data.title}</Text>
+                </View>
+              </View>
+            )}
+          />
+        </ScrollView>
+      </>
+    );
+  } else if (isServiceUnavailable && isConnected) {
+    availabilitySwitch = (
+      <View
+        style={{
+          flex: 1,
+          marginTop: 100,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "white"
+        }}
+      >
+        <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+          Estamos fuera de servicio
+        </Text>
+        <ClosedAnimation />
+      </View>
+    );
+  } else {
+    availabilitySwitch = (
+      <View style={{ justifyContent: "center", alignItems: "center" }}>
+        <Image
+          style={{ width: 100, height: 100, marginTop: 50 }}
+          source={require("../assets/no-wifi.png")}
+        />
+        <Text style={{ marginTop: 20 }}>Conectate al internet, por favor</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      <ScrollView>
+        <View style={{ height: 220 }}>
+          <Swiper
+            dot={
+              <View
+                style={{
+                  backgroundColor: "rgba(255,255,255,.3)",
+                  width: 13,
+                  height: 13,
+                  borderRadius: 7,
+                  marginLeft: 7,
+                  marginRight: 7
+                }}
+              />
+            }
+            activeDot={
+              <View
+                style={{
+                  backgroundColor: "#fff",
+                  width: 13,
+                  height: 13,
+                  borderRadius: 7,
+                  marginLeft: 7,
+                  marginRight: 7
+                }}
+              />
+            }
+            style={styles.wrapper}
+            loop={false}
+          >
+            <View testID="Hello" style={styles.slide1}>
+              <Image
+                resizeMode="cover"
+                style={{ height: "100%", width: "100%" }}
+                source={require("../assets/swiperImg1.png")}
+              />
+            </View>
+            <View testID="Beautiful" style={styles.slide2}>
+              <Image
+                resizeMode="cover"
+                style={{ height: "100%", width: "100%" }}
+                source={require("../assets/swiperImage2.jpg")}
+              />
+            </View>
+            <View testID="Simple" style={styles.slide3}>
+              <Image
+                resizeMode="cover"
+                style={{ height: "100%", width: "100%" }}
+                source={require("../assets/swiperImg3.jpg")}
+              />
+            </View>
+          </Swiper>
+        </View>
+        <View>{availabilitySwitch}</View>
+      </ScrollView>
+      {basketBtn}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  localCardImage: {
+    height: 120,
+    justifyContent: "flex-start",
+    alignItems: "flex-end",
+    margin:10
+  },
+  container: {
+    flex: 1,
+    height: "100%",
+    backgroundColor: "white"
+  },
+  tacos: {
+    fontWeight: "bold",
+    color: "#ed3783",
+    fontSize: 20,
+    marginLeft: 20,
+    marginBottom: 8
+  },
+  basketBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    height: 50,
+    backgroundColor: "#ed3783",
+    color: "white"
+  },
+  count: {
+    color: "white",
+    fontSize: 20,
+    marginLeft: 20
+  },
+  wrapper: { color: "white" },
+  slide1: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "white",
+    color: "white"
+  },
+  slide2: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "white"
+  },
+  slide3: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#92BBD9"
+  },
+  text: {
+    color: "#fff",
+    fontSize: 30,
+    fontWeight: "bold"
+  }
+});
